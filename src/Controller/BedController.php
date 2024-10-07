@@ -21,7 +21,7 @@ class BedController extends AbstractController
     #[Route('/bed', name: 'app_bed')]
     public function index(): Response
     {
-        return $this->render('bed/index.html.twig', [
+        return $this->render('bed/new.html.twig', [
             'controller_name' => 'BedController',
         ]);
     }
