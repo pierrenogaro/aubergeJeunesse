@@ -15,40 +15,41 @@ class Room
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups("roomsjson")]
+    #[Groups(["rooms_read", "room_edit", "room_create", "room_edit"])]
     private ?int $id = null;
 
     #[ORM\Column(type: Types::TEXT)]
-    #[Groups("roomsjson")]
+    #[Groups(["rooms_read", "room_edit", "room_create", "room_edit"])]
     private ?string $name = null;
 
     /**
      * @var Collection<int, Bed>
      */
     #[ORM\OneToMany(targetEntity: Bed::class, mappedBy: 'room', cascade: ['persist', 'remove'])]
-    #[Groups("roomsjson")]
+    #[Groups(["rooms_read", "room_edit", "room_create", "room_edit"])]
     private Collection $beds;
 
     #[ORM\Column]
-    #[Groups("roomsjson")]
+    #[Groups(["rooms_read", "room_edit", "room_create", "room_edit"])]
     private ?int $capacity = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups("roomsjson")]
+    #[Groups(["rooms_read", "room_edit", "room_create", "room_edit"])]
     private ?string $type = null;
 
     #[ORM\Column(type: Types::TEXT)]
-    #[Groups("roomsjson")]
+    #[Groups(["rooms_read", "room_edit", "room_create", "room_edit"])]
     private ?string $description = null;
 
     #[ORM\Column]
-    #[Groups("roomsjson")]
+    #[Groups(["rooms_read", "room_edit", "room_create", "room_edit"])]
     private ?bool $isAvailable = true;
 
     /**
      * @var Collection<int, Booking>
      */
     #[ORM\ManyToMany(targetEntity: Booking::class, mappedBy: 'room')]
+    #[Groups(["rooms_read", "room_edit", "room_create", "room_edit"])]
     private Collection $bookings;
 
     public function __construct()

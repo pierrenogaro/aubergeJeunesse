@@ -7,6 +7,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Attribute\Groups;
 
 #[ORM\Entity(repositoryClass: BookingRepository::class)]
 class Booking
@@ -14,31 +15,40 @@ class Booking
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups(["bookings_read","booking_create", "booking_edit"])]
     private ?int $id = null;
 
     #[ORM\Column(type: Types::DATE_MUTABLE)]
+    #[Groups(["bookings_read","booking_create", "booking_edit"])]
     private ?\DateTimeInterface $startDate = null;
 
     #[ORM\Column(type: Types::DATE_MUTABLE)]
+    #[Groups(["bookings_read","booking_create", "booking_edit"])]
     private ?\DateTimeInterface $endDate = null;
 
     #[ORM\Column(length: 255)]
+    #[Groups(["bookings_read","booking_create", "booking_edit"])]
     private ?string $name = null;
 
     #[ORM\Column(length: 255)]
+    #[Groups(["bookings_read","booking_create", "booking_edit"])]
     private ?string $email = null;
 
     #[ORM\Column(length: 255)]
+    #[Groups(["bookings_read","booking_create", "booking_edit"])]
     private ?string $phone = null;
 
     #[ORM\Column]
+    #[Groups(["bookings_read","booking_create", "booking_edit"])]
     private ?int $numberOfPeople = null;
 
     /**
      * @var Collection<int, Room>
      */
-    #[ORM\ManyToMany(targetEntity: Room::class, inversedBy: 'bookings')]
+    #[ORM\ManyToMany(targetEntity: Room::class, inversedBy: 'bookings', cascade: ['persist'])]
+    #[Groups(["bookings_read","booking_create", "booking_edit"])]
     private Collection $room;
+
 
     public function __construct()
     {

@@ -3,9 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\Bed;
-use App\Entity\Room;
 use App\Repository\BedRepository;
-use App\Repository\RoomRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Bundle\SecurityBundle\Security;
@@ -18,12 +16,11 @@ use Symfony\Component\Serializer\SerializerInterface;
 
 class BedController extends AbstractController
 {
-    #[Route('/bed', name: 'app_bed')]
-    public function index(): Response
+    #[Route('/api/beds', name: 'app_beds')]
+    public function index(BedRepository $bedRepository): Response
     {
-        return $this->render('bed/new.html.twig', [
-            'controller_name' => 'BedController',
-        ]);
+        $beds = $bedRepository->findAll();
+        return $this->json($beds, 200, [], ['groups' => 'beds_read']);
     }
 
     #[Route('/api/create/bed', name: 'create_bed', methods: ['POST'])]
@@ -39,7 +36,7 @@ class BedController extends AbstractController
         $manager->persist($bed);
         $manager->flush();
 
-        return $this->json($bed, 200, [], ['groups' => ['bedjson']]);
+        return $this->json($bed, 200, [], ['groups' => ['bed_create']]);
 
 
     }

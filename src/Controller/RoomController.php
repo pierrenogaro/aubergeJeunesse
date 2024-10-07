@@ -20,7 +20,7 @@ class RoomController extends AbstractController
     public function index(RoomRepository $roomRepository): Response
     {
         $rooms = $roomRepository->findAll();
-        return $this->json($rooms, 200, [], ['groups' => 'roomsjson']);
+        return $this->json($rooms, 200, [], ['groups' => 'rooms_read']);
     }
 
     #[Route('/api/create/room', name: 'create_room', methods: ['POST'])]
@@ -36,7 +36,7 @@ class RoomController extends AbstractController
         $manager->persist($room);
         $manager->flush();
 
-        return $this->json($room, 200, [], ['groups' => ['roomsjson']]);
+        return $this->json($room, 200, [], ['groups' => ['room_create']]);
 
 
     }
@@ -69,7 +69,7 @@ class RoomController extends AbstractController
 
         $manager->flush();
 
-        return $this->json($room, 200, [], ['groups' => ['roomsjson']]);
+        return $this->json($room, 200, [], ['groups' => ['room_edit']]);
 
     }
 

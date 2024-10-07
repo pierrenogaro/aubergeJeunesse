@@ -3,11 +3,34 @@
 {% block title %}New Booking{% endblock %}
 
 {% block body %}
-    <h1>Create a new Booking</h1>
+    <h1 class="mt-5 mb-4">Create a New Booking</h1>
 
-    {{ form_start(form) }}
-    {{ form_widget(form) }}
-    <button class="btn">Submit</button>
+    {{ form_start(form, {'attr': {'class': 'needs-validation', 'novalidate': 'novalidate'}}) }}
+    <div class="form-group">
+        {{ form_label(form.startDate, 'Arrival Date', {'label_attr': {'class': 'form-label'}}) }}
+        {{ form_widget(form.startDate, {'attr': {'class': 'form-control', 'placeholder': 'MM/DD/YYYY'}}) }}
+    </div>
+
+    <div class="form-group">
+        {{ form_label(form.endDate, 'Departure Date', {'label_attr': {'class': 'form-label'}}) }}
+        {{ form_widget(form.endDate, {'attr': {'class': 'form-control', 'placeholder': 'MM/DD/YYYY'}}) }}
+    </div>
+
+    <div class="form-group">
+        {{ form_label(form.numberOfPeople, 'Number of People', {'label_attr': {'class': 'form-label'}}) }}
+        {{ form_widget(form.numberOfPeople, {'attr': {'class': 'form-control', 'placeholder': 'Please enter the number of people'}}) }}
+    </div>
+
+    <div class="form-group">
+        {{ form_label(form.room, 'Room Type', {'label_attr': {'class': 'form-label'}}) }}
+        <div>
+            {% for room in form.room %}
+                {{ form_widget(room, {'attr': {'class': 'form-check-input'}}) }} {{ form_label(room) }}
+            {% endfor %}
+        </div>
+    </div>
+
+    <button class="btn btn-primary">Reserve</button>
     {{ form_end(form) }}
 
 {% endblock %}

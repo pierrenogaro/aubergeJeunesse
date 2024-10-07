@@ -18,23 +18,25 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups("userjson")]
+    #[Groups(["userjson"])]
     private ?int $id = null;
 
     #[ORM\Column(length: 180)]
-    #[Groups("userjson")]
+    #[Groups(["userjson"])]
     private ?string $username = null;
 
     /**
      * @var list<string> The user roles
      */
     #[ORM\Column]
+    #[Groups(["userjson"])]
     private array $roles = [];
 
     /**
      * @var string The hashed password
      */
     #[ORM\Column]
+    #[Groups(["userjson"])]
     private ?string $password = null;
 
     public function getId(): ?int
