@@ -32,7 +32,6 @@ class RoomController extends AbstractController
             throw new AccessDeniedException('You must be logged in to create a room.');
         }
 
-
         $manager->persist($room);
         $manager->flush();
 

@@ -15,41 +15,41 @@ class Room
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(["rooms_read", "room_edit", "room_create", "room_edit"])]
+    #[Groups(["rooms_read", "room_edit", "room_create", "room_delete"])]
     private ?int $id = null;
 
     #[ORM\Column(type: Types::TEXT)]
-    #[Groups(["rooms_read", "room_edit", "room_create", "room_edit"])]
+    #[Groups(["rooms_read", "room_edit", "room_create", "room_delete"])]
     private ?string $name = null;
 
     /**
      * @var Collection<int, Bed>
      */
     #[ORM\OneToMany(targetEntity: Bed::class, mappedBy: 'room', cascade: ['persist', 'remove'])]
-    #[Groups(["rooms_read", "room_edit", "room_create", "room_edit"])]
+    #[Groups(["rooms_read", "room_edit", "room_create", "room_delete"])]
     private Collection $beds;
 
     #[ORM\Column]
-    #[Groups(["rooms_read", "room_edit", "room_create", "room_edit"])]
+    #[Groups(["rooms_read", "room_edit", "room_create", "room_delete", "beds_read"])]
     private ?int $capacity = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(["rooms_read", "room_edit", "room_create", "room_edit"])]
+    #[Groups(["rooms_read", "room_edit", "room_create", "room_delete", "beds_read"])]
     private ?string $type = null;
 
     #[ORM\Column(type: Types::TEXT)]
-    #[Groups(["rooms_read", "room_edit", "room_create", "room_edit"])]
+    #[Groups(["rooms_read", "room_edit", "room_create", "room_delete", "beds_read"])]
     private ?string $description = null;
 
     #[ORM\Column]
-    #[Groups(["rooms_read", "room_edit", "room_create", "room_edit"])]
+    #[Groups(["rooms_read", "room_edit", "room_create", "room_delete", "beds_read"])]
     private ?bool $isAvailable = true;
 
     /**
      * @var Collection<int, Booking>
      */
     #[ORM\ManyToMany(targetEntity: Booking::class, mappedBy: 'room')]
-    #[Groups(["rooms_read", "room_edit", "room_create", "room_edit"])]
+    #[Groups(["rooms_read", "room_edit", "room_create", "room_delete", "beds_read"])]
     private Collection $bookings;
 
     public function __construct()

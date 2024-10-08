@@ -12,23 +12,23 @@ class Bed
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(["beds_read", "bed_create", "bed_edit"])]
+    #[Groups(["beds_read", "bed_create", "bed_edit", "rooms_read"])]
     private ?int $id = null;
 
-    #[ORM\ManyToOne(inversedBy: 'beds', cascade: ['persist', 'remove'])]
-    #[Groups(["beds_read", "bed_create", "bed_edit"])]
+    #[ORM\ManyToOne(cascade: ['persist', 'remove'], inversedBy: 'beds')]
+    #[Groups(["beds_read", "bed_create", "bed_edit", "rooms_read"])]
     private ?Room $room = null;
 
     #[ORM\Column]
-    #[Groups(["beds_read", "bed_create", "bed_edit"])]
+    #[Groups(["beds_read", "bed_create", "bed_edit", "rooms_read"])]
     private ?int $number = null;
 
     #[ORM\Column]
-    #[Groups(["beds_read", "bed_create", "bed_edit"])]
+    #[Groups(["beds_read", "bed_create", "bed_edit", "rooms_read"])]
     private ?bool $isAvailable = true;
 
     #[ORM\Column(length: 255)]
-    #[Groups(["beds_read", "bed_create", "bed_edit"])]
+    #[Groups(["beds_read", "bed_create", "bed_edit", "rooms_read"])]
     private ?string $bedNumber = null;
 
     public function getId(): ?int
