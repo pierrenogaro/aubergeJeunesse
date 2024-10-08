@@ -15,11 +15,11 @@ class Room
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(["rooms_read", "room_edit", "room_create", "room_delete"])]
+    #[Groups(["rooms_read", "room_edit", "room_create", "room_delete", "bed_edit"])]
     private ?int $id = null;
 
     #[ORM\Column(type: Types::TEXT)]
-    #[Groups(["rooms_read", "room_edit", "room_create", "room_delete"])]
+    #[Groups(["rooms_read", "room_edit", "room_create", "room_delete", "bed_edit"])]
     private ?string $name = null;
 
     /**
@@ -30,26 +30,26 @@ class Room
     private Collection $beds;
 
     #[ORM\Column]
-    #[Groups(["rooms_read", "room_edit", "room_create", "room_delete", "beds_read"])]
+    #[Groups(["rooms_read", "room_edit", "room_create", "room_delete", "bed_edit", "bed_create"])]
     private ?int $capacity = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(["rooms_read", "room_edit", "room_create", "room_delete", "beds_read"])]
+    #[Groups(["rooms_read", "room_edit", "room_create", "room_delete", "beds_read", "bed_edit", "bed_create"])]
     private ?string $type = null;
 
     #[ORM\Column(type: Types::TEXT)]
-    #[Groups(["rooms_read", "room_edit", "room_create", "room_delete", "beds_read"])]
+    #[Groups(["rooms_read", "room_edit", "room_create", "room_delete", "beds_read", "bed_edit", "bed_create"])]
     private ?string $description = null;
 
     #[ORM\Column]
-    #[Groups(["rooms_read", "room_edit", "room_create", "room_delete", "beds_read"])]
+    #[Groups(["rooms_read", "room_edit", "room_create", "room_delete", "beds_read", "bed_edit", "bed_create"])]
     private ?bool $isAvailable = true;
 
     /**
      * @var Collection<int, Booking>
      */
     #[ORM\ManyToMany(targetEntity: Booking::class, mappedBy: 'room')]
-    #[Groups(["rooms_read", "room_edit", "room_create", "room_delete", "beds_read"])]
+    #[Groups(["rooms_read", "room_edit", "room_create", "room_delete", "beds_read", "bed_edit", "bed_create"])]
     private Collection $bookings;
 
     public function __construct()

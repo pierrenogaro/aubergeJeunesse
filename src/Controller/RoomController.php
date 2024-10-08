@@ -41,7 +41,7 @@ class RoomController extends AbstractController
     }
 
     #[Route('/api/delete/room/{id}', name: 'app_room_delete', methods: ['DELETE'])]
-    public function delete(Request $request, Room $room, Security $security, EntityManagerInterface $manager): Response
+    public function delete(Request $request, Room $room, EntityManagerInterface $manager): Response
     {
         if (!$room) {
             return $this->json(['error' => 'Room not found'], 404);

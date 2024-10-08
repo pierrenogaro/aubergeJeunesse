@@ -24,7 +24,7 @@ class BedController extends AbstractController
     }
 
     #[Route('/api/create/bed', name: 'create_bed', methods: ['POST'])]
-    public function create(Request $request, BedRepository $bedRepository, RoomRepository $roomRepository, SerializerInterface $serializer, EntityManagerInterface $manager, Security $security): JsonResponse
+    public function create(Request $request, RoomRepository $roomRepository, SerializerInterface $serializer, EntityManagerInterface $manager, Security $security): JsonResponse
     {
         $data = json_decode($request->getContent(), true);
 
@@ -48,5 +48,37 @@ class BedController extends AbstractController
         $manager->flush();
 
         return $this->json($bed, 200, [], ['groups' => ['bed_create']]);
+    }
+
+    #[Route('/api/delete/bed/{id}', name: 'app_bed_delete', methods: ['DELETE'])]
+    public function delete(Request $request, Bed $bed, EntityManagerInterface $manager): Response
+    {
+        if (!$bed) {
+            return $this->json(['error' => 'Bed not found'], 404);
+        }
+
+
+        $manager->remove($bed);
+        $manager->flush();
+
+
+        return $this->json(['message' => 'Bed deleted successfully'], 200);
+
+    }
+
+    #[Route('/api/edit/bed/{id}', name: 'edit_bed', methods: ['PUT'])]
+    public function edit(Request $request, Bed $bed, SerializerInterface $serializer, EntityManagerInterface $manager, Security $security): JsonResponse
+    {
+        if (!$bed) {
+            return $this->json(['error' => 'Bed not found'], 404);
+        }
+
+
+        $serializer->deserialize($request->getContent(), Bed::class, 'json', ['object_to_populate' => $bed]);
+
+        $manager->flush();
+
+        return $this->json($bed, 200, [], ['groups' => ['bed_edit']]);
+
     }
 }
