@@ -16,7 +16,7 @@ class Bed
     private ?int $id = null;
 
     #[ORM\ManyToOne(cascade: ['persist', 'remove'], inversedBy: 'beds')]
-    #[Groups(["beds_read", "bed_create", "bed_edit", "rooms_read"])]
+    #[Groups(["beds_read", "bed_create", "bed_edit"])]
     private ?Room $room = null;
 
     #[ORM\Column]
