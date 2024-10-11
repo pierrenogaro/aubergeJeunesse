@@ -51,7 +51,7 @@ class BedController extends AbstractController
     }
 
     #[Route('/api/delete/bed/{id}', name: 'app_bed_delete', methods: ['DELETE'])]
-    public function delete(Request $request, Bed $bed, EntityManagerInterface $manager): Response
+    public function delete(Bed $bed, EntityManagerInterface $manager): Response
     {
         if (!$bed) {
             return $this->json(['error' => 'Bed not found'], 404);
