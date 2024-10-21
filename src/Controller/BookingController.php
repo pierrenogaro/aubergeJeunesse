@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Entity\Booking;
 use App\Repository\BookingRepository;
 use App\Repository\RoomRepository;
+use App\Service\StripeService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Bundle\SecurityBundle\Security;
@@ -74,5 +75,24 @@ class BookingController extends AbstractController
 
         return $this->json(['message' => 'Booking deleted successfully'], 201);
 
+    }
+
+    #[Route('/api/create-checkout-session', name: 'create_checkout_session', methods: ['POST'])]
+    public function createCheckoutSession(StripeService $stripeService): JsonResponse
+    {
+        $lineItems = [
+            'price_data' => [
+                'currency' => 'eur',
+                'product_data' => [
+                    'name' => 'Réservation de chambre',
+                ],
+                'unit_amount' => 5000,
+            ],
+            'quantity' => 1,
+        ];
+
+        $checkoutSession = $stripeService->createCheckoutSession([$lineItems]);
+
+        return $this->json(['id' => $checkoutSession->id]);
     }
 }
