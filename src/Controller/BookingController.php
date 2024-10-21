@@ -95,4 +95,18 @@ class BookingController extends AbstractController
 
         return $this->json(['id' => $checkoutSession->id]);
     }
+
+    #[Route('/payment/success', name: 'payment_success')]
+    public function success(): Response
+    {
+        return $this->json(['message' => 'Payment successful! Your booking has been confirmed.']);
+    }
+
+    #[Route('/payment/cancel', name: 'payment_cancel')]
+    public function cancel(): Response
+    {
+        return $this->json(['message' => 'Payment cancelled. Your booking was not completed.']);
+    }
+
+
 }

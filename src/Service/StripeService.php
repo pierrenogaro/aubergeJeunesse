@@ -22,8 +22,8 @@ class StripeService
             'payment_method_types' => ['card'],
             'line_items' => [$lineItems],
             'mode' => 'payment',
-            'success_url' => 'https://votre-site/success',
-            'cancel_url' => 'https://votre-site/cancel',
+            'success_url' => 'http://localhost:8000/payment/success',
+            'cancel_url' => 'http://localhost:8000/payment/cancel'
         ]);
     }
 }
