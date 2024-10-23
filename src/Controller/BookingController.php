@@ -7,6 +7,7 @@ use App\Repository\BookingRepository;
 use App\Repository\RoomRepository;
 use App\Service\StripeService;
 use Doctrine\ORM\EntityManagerInterface;
+use Stripe\Exception\ApiErrorException;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -77,9 +78,17 @@ class BookingController extends AbstractController
 
     }
 
+    /**
+     * @throws ApiErrorException
+     */
     #[Route('/api/create-checkout-session', name: 'create_checkout_session', methods: ['POST'])]
-    public function createCheckoutSession(StripeService $stripeService): JsonResponse
+    public function createCheckoutSession(StripeService $stripeService, Security $security): JsonResponse
     {
+        $user = $security->getUser();
+        if (!$user) {
+            return $this->json(['error' => 'You must be logged in to create a booking.'], 403);
+        }
+
         $lineItems = [
             'price_data' => [
                 'currency' => 'eur',
@@ -95,6 +104,7 @@ class BookingController extends AbstractController
 
         return $this->json(['id' => $checkoutSession->id]);
     }
+
 
     #[Route('/payment/success', name: 'payment_success')]
     public function success(): Response
