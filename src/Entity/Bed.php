@@ -31,6 +31,10 @@ class Bed
     #[Groups(["beds_read", "bed_create", "bed_edit", "rooms_read", "room_edit"])]
     private ?string $bedNumber = null;
 
+    #[ORM\Column(type: 'boolean', options: ['default' => false])]
+    #[Groups(["beds_read", "bed_create", "bed_edit", "rooms_read", "room_edit"])]
+    private ?bool $isCleaned = false;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -80,6 +84,18 @@ class Bed
     public function setBedNumber(string $bedNumber): static
     {
         $this->bedNumber = $bedNumber;
+
+        return $this;
+    }
+
+    public function isCleaned(): ?bool
+    {
+        return $this->isCleaned;
+    }
+
+    public function setIsCleaned(bool $isCleaned): static
+    {
+        $this->isCleaned = $isCleaned;
 
         return $this;
     }

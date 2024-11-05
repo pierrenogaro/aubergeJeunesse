@@ -81,4 +81,33 @@ class BedController extends AbstractController
         return $this->json($bed, 200, [], ['groups' => ['bed_edit']]);
 
     }
+
+    #[Route('/api/beds/{id}/clean-status', name: 'update_bed_clean_status', methods: ['PUT'])]
+    public function updateCleanStatus(Bed $bed, Request $request, EntityManagerInterface $manager): JsonResponse
+    {
+        if (!$bed) {
+            return $this->json(['error' => 'Bed not found'], 404);
+        }
+
+        $data = json_decode($request->getContent(), true);
+        if (isset($data['isCleaned'])) {
+            $bed->setIsCleaned((bool) $data['isCleaned']);
+            $manager->flush();
+
+            return $this->json(['message' => 'Bed clean status updated', 'isCleaned' => $bed->isCleaned()], 200);
+        }
+
+        return $this->json(['error' => 'Invalid data'], 400);
+    }
+
+    #[Route('/api/beds/{id}/clean-status', name: 'get_bed_clean_status', methods: ['GET'])]
+    public function getCleanStatus(Bed $bed): JsonResponse
+    {
+        if (!$bed) {
+            return $this->json(['error' => 'Bed not found'], 404);
+        }
+
+        return $this->json(['isCleaned' => $bed->isCleaned()], 200);
+    }
+
 }
