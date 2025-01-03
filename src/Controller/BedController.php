@@ -82,7 +82,7 @@ class BedController extends AbstractController
 
     }
 
-    #[Route('/api/beds/{id}/clean-status', name: 'update_bed_clean_status', methods: ['PUT'])]
+    #[Route('/api/beds/edit/{id}/clean-status', name: 'update_bed_clean_status', methods: ['PUT'])]
     public function updateCleanStatus(Bed $bed, Request $request, EntityManagerInterface $manager): JsonResponse
     {
         if (!$bed) {

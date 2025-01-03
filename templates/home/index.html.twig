@@ -1,20 +1,638 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Hello HomeController!{% endblock %}
+{% block title %}
+    Auberge Jeunesse API
+{% endblock %}
 
 {% block body %}
-<style>
-    .example-wrapper { margin: 1em auto; max-width: 800px; width: 95%; font: 18px/1.5 sans-serif; }
-    .example-wrapper code { background: #F5F5F5; padding: 2px 6px; }
-</style>
+    <div class="container my-5">
+        <h1 class="mb-4 text-center text-primary">🏨 Auberge Jeunesse API Documentation</h1>
 
-<div class="example-wrapper">
-    <h1>Hello {{ controller_name }}! ✅</h1>
+        <div class="card mb-4 shadow-sm">
+            <div class="card-header bg-primary text-white">
+                <h2>📢 Overview</h2>
+            </div>
+            <div class="card-body">
+                <p>This API allows you to manage users, reservations, rooms, events, employees, beds, and more for an auberge de jeunesse. It includes authentication for secure access to protected routes.</p>
+                <p>Base URL: <code>https://auberge-jeunesse.pierrenogaro.com</code></p>
+                <p class="text-danger"><strong>Important:</strong> All routes starting with <code>/api</code> require an authentication token. Include the token in the <code>Authorization</code> header as <code>Bearer your_token_here</code>.</p>
+            </div>
+        </div>
 
-    This friendly message is coming from:
-    <ul>
-        <li>Your controller at <code>/home/pierre/Documents/symfony/aubergeJeunesse/src/Controller/HomeController.php</code></li>
-        <li>Your template at <code>/home/pierre/Documents/symfony/aubergeJeunesse/templates/home/index.html.twig</code></li>
-    </ul>
-</div>
+        <!-- Registration Section -->
+        <div class="card mb-4 shadow-sm">
+            <div class="card-header bg-secondary text-white">
+                <h2>🔐 Register</h2>
+            </div>
+            <div class="card-body">
+                <p><code class="text-primary">POST https://auberge-jeunesse.pierrenogaro.com/register</code></p>
+
+                <h4>📤 Request</h4>
+                <p>The request body must be sent in JSON format:</p>
+                <pre class="bg-light p-3 rounded">
+{
+    "username": "your_username",
+    "password": "your_password"
+}
+            </pre>
+
+                <h4>📥 Response</h4>
+                <p>On success, the server responds with the created user object:</p>
+                <pre class="bg-light p-3 rounded">
+{
+    "id": 1,
+    "username": "your_username"
+}
+            </pre>
+
+                <h4>⚠️ Errors</h4>
+                <ul>
+                    <li><strong>300 Multiple Choices:</strong> Username already exists.</li>
+                    <li><strong>400 Bad Request:</strong> Invalid or missing fields in the request body.</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Login Section -->
+        <div class="card mb-4 shadow-sm">
+            <div class="card-header bg-success text-white">
+                <h2>🔐 Login</h2>
+            </div>
+            <div class="card-body">
+                <p><code class="text-primary">POST https://auberge-jeunesse.pierrenogaro.com/login_check</code></p>
+
+                <h4>📤 Request</h4>
+                <p>The request body must be sent in JSON format:</p>
+                <pre class="bg-light p-3 rounded">
+{
+    "username": "your_username",
+    "password": "your_password"
+}
+            </pre>
+
+                <h4>📥 Response</h4>
+                <p>On success, the server responds with an authentication token:</p>
+                <pre class="bg-light p-3 rounded">
+{
+    "token": "your_jwt_token"
+}
+            </pre>
+
+                <h4>⚠️ Errors</h4>
+                <ul>
+                    <li><strong>401 Unauthorized:</strong> Invalid username or password.</li>
+                    <li><strong>400 Bad Request:</strong> Missing or malformed fields in the request body.</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Room Management Section -->
+        <div class="card mb-4 shadow-sm">
+            <div class="card-header bg-info text-white">
+                <h2>🛏️ Room Management</h2>
+            </div>
+            <div class="card-body">
+
+                <!-- Get All Rooms -->
+                <div class="card mb-3">
+                    <div class="card-body">
+                        <h5>Get All Rooms</h5>
+                        <p><strong>GET</strong> <code>https://auberge-jeunesse.pierrenogaro.com/api/rooms</code></p>
+                        <p>Retrieve a list of all rooms in the system.</p>
+                        <p><strong>Response Example:</strong></p>
+                        <pre class="bg-light p-3 rounded">
+[
+    {
+        "id": 1,
+        "name": "Room A",
+        "capacity": 4,
+        ...
+    },
+    ...
+]
+                    </pre>
+                    </div>
+                </div>
+
+                <!-- Create Room -->
+                <div class="card mb-3">
+                    <div class="card-body">
+                        <h5>Create a Room</h5>
+                        <p><strong>POST</strong> <code>https://auberge-jeunesse.pierrenogaro.com/api/create/room</code></p>
+                        <p>Create a new room. You must be logged in to use this endpoint.</p>
+                        <p><strong>Request Example:</strong></p>
+                        <pre class="bg-light p-3 rounded">
+{
+    "name": "Room B",
+    "capacity": 3
+}
+                    </pre>
+                        <p><strong>Response Example:</strong></p>
+                        <pre class="bg-light p-3 rounded">
+{
+    "id": 2,
+    "name": "Room B",
+    "capacity": 3,
+    ...
+}
+                    </pre>
+                    </div>
+                </div>
+
+                <!-- Edit Room -->
+                <div class="card mb-3">
+                    <div class="card-body">
+                        <h5>Edit a Room</h5>
+                        <p><strong>PUT</strong> <code>https://auberge-jeunesse.pierrenogaro.com/api/edit/room/{id}</code></p>
+                        <p>Edit an existing room by providing its ID.</p>
+                        <p><strong>Request Example:</strong></p>
+                        <pre class="bg-light p-3 rounded">
+{
+    "name": "Updated Room",
+    "capacity": 5
+}
+                    </pre>
+                        <p><strong>Response Example:</strong></p>
+                        <pre class="bg-light p-3 rounded">
+{
+    "id": 2,
+    "name": "Updated Room",
+    "capacity": 5,
+    ...
+}
+                    </pre>
+                    </div>
+                </div>
+
+                <!-- Delete Room -->
+                <div class="card mb-3">
+                    <div class="card-body">
+                        <h5>Delete a Room</h5>
+                        <p><strong>DELETE</strong> <code>https://auberge-jeunesse.pierrenogaro.com/api/delete/room/{id}</code></p>
+                        <p>Delete a room by providing its ID.</p>
+                        <p><strong>Response Example:</strong></p>
+                        <pre class="bg-light p-3 rounded">
+{
+    "message": "Room deleted successfully"
+}
+                    </pre>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        <!-- Event Management Section -->
+        <div class="card mb-4 shadow-sm">
+            <div class="card-header bg-warning text-white">
+                <h2>📅 Event Management</h2>
+            </div>
+            <div class="card-body">
+
+                <!-- Get All Events -->
+                <div class="card mb-3">
+                    <div class="card-body">
+                        <h5>Get All Events</h5>
+                        <p><strong>GET</strong> <code>https://auberge-jeunesse.pierrenogaro.com/api/events</code></p>
+                        <p>Retrieve a list of all events.</p>
+                        <p><strong>Response Example:</strong></p>
+                        <pre class="bg-light p-3 rounded">
+[
+    {
+        "id": 1,
+        "title": "Event A",
+        "description": "Description of Event A",
+        ...
+    },
+    ...
+]
+                    </pre>
+                    </div>
+                </div>
+
+                <!-- Create Event -->
+                <div class="card mb-3">
+                    <div class="card-body">
+                        <h5>Create an Event</h5>
+                        <p><strong>POST</strong> <code>https://auberge-jeunesse.pierrenogaro.com/api/create/event</code></p>
+                        <p>Create a new event. You must be logged in to use this endpoint.</p>
+                        <p><strong>Request Example:</strong></p>
+                        <pre class="bg-light p-3 rounded">
+{
+    "title": "Event B",
+    "description": "Details about Event B",
+    "date": "2025-01-05"
+}
+                    </pre>
+                        <p><strong>Response Example:</strong></p>
+                        <pre class="bg-light p-3 rounded">
+{
+    "id": 2,
+    "title": "Event B",
+    "description": "Details about Event B",
+    "date": "2025-01-05",
+    ...
+}
+                    </pre>
+                    </div>
+                </div>
+
+                <!-- Edit Event -->
+                <div class="card mb-3">
+                    <div class="card-body">
+                        <h5>Edit an Event</h5>
+                        <p><strong>PUT</strong> <code>https://auberge-jeunesse.pierrenogaro.com/api/edit/event/{id}</code></p>
+                        <p>Edit an existing event by providing its ID.</p>
+                        <p><strong>Request Example:</strong></p>
+                        <pre class="bg-light p-3 rounded">
+{
+    "title": "Updated Event",
+    "description": "Updated details",
+    "date": "2025-01-06"
+}
+                    </pre>
+                        <p><strong>Response Example:</strong></p>
+                        <pre class="bg-light p-3 rounded">
+{
+    "id": 2,
+    "title": "Updated Event",
+    "description": "Updated details",
+    "date": "2025-01-06",
+    ...
+}
+                    </pre>
+                    </div>
+                </div>
+
+                <!-- Delete Event -->
+                <div class="card mb-3">
+                    <div class="card-body">
+                        <h5>Delete an Event</h5>
+                        <p><strong>DELETE</strong> <code>https://auberge-jeunesse.pierrenogaro.com/api/delete/event/{id}</code></p>
+                        <p>Delete an event by providing its ID.</p>
+                        <p><strong>Response Example:</strong></p>
+                        <pre class="bg-light p-3 rounded">
+{
+    "message": "Event deleted successfully"
+}
+                    </pre>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Employee Management Section -->
+        <div class="card mb-4 shadow-sm">
+            <div class="card-header bg-danger text-white">
+                <h2>👔 Employee Management</h2>
+            </div>
+            <div class="card-body">
+
+                <!-- Get All Employees -->
+                <div class="card mb-3">
+                    <div class="card-body">
+                        <h5>Get All Employees</h5>
+                        <p><strong>GET</strong> <code>https://auberge-jeunesse.pierrenogaro.com/api/employees</code></p>
+                        <p>Retrieve a list of all employees.</p>
+                        <p><strong>Response Example:</strong></p>
+                        <pre class="bg-light p-3 rounded">
+[
+    {
+        "id": 1,
+        "name": "John Doe",
+        "position": "Manager",
+        ...
+    },
+    ...
+]
+                    </pre>
+                    </div>
+                </div>
+
+                <!-- Create Employee -->
+                <div class="card mb-3">
+                    <div class="card-body">
+                        <h5>Create an Employee</h5>
+                        <p><strong>POST</strong> <code>https://auberge-jeunesse.pierrenogaro.com/api/create/employee</code></p>
+                        <p>Create a new employee. You must be logged in to use this endpoint.</p>
+                        <p><strong>Request Example:</strong></p>
+                        <pre class="bg-light p-3 rounded">
+{
+    "name": "Jane Doe",
+    "position": "Receptionist",
+    "salary": 2500
+}
+                    </pre>
+                        <p><strong>Response Example:</strong></p>
+                        <pre class="bg-light p-3 rounded">
+{
+    "id": 2,
+    "name": "Jane Doe",
+    "position": "Receptionist",
+    "salary": 2500,
+    ...
+}
+                    </pre>
+                    </div>
+                </div>
+
+                <!-- Edit Employee -->
+                <div class="card mb-3">
+                    <div class="card-body">
+                        <h5>Edit an Employee</h5>
+                        <p><strong>PUT</strong> <code>https://auberge-jeunesse.pierrenogaro.com/api/edit/employee/{id}</code></p>
+                        <p>Edit an existing employee by providing their ID.</p>
+                        <p><strong>Request Example:</strong></p>
+                        <pre class="bg-light p-3 rounded">
+{
+    "name": "Updated Name",
+    "position": "Updated Position",
+    "salary": 3000
+}
+                    </pre>
+                        <p><strong>Response Example:</strong></p>
+                        <pre class="bg-light p-3 rounded">
+{
+    "id": 2,
+    "name": "Updated Name",
+    "position": "Updated Position",
+    "salary": 3000,
+    ...
+}
+                    </pre>
+                    </div>
+                </div>
+
+                <!-- Delete Employee -->
+                <div class="card mb-3">
+                    <div class="card-body">
+                        <h5>Delete an Employee</h5>
+                        <p><strong>DELETE</strong> <code>https://auberge-jeunesse.pierrenogaro.com/api/delete/employee/{id}</code></p>
+                        <p>Delete an employee by providing their ID.</p>
+                        <p><strong>Response Example:</strong></p>
+                        <pre class="bg-light p-3 rounded">
+{
+    "message": "Employee deleted successfully"
+}
+                    </pre>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Booking Management Section -->
+        <div class="card mb-4 shadow-sm">
+            <div class="card-header bg-dark text-white">
+                <h2>🛏️ Booking Management</h2>
+            </div>
+            <div class="card-body">
+
+                <!-- Get All Bookings -->
+                <div class="card mb-3">
+                    <div class="card-body">
+                        <h5>Get All Bookings</h5>
+                        <p><strong>GET</strong> <code>https://auberge-jeunesse.pierrenogaro.com/api/bookings</code></p>
+                        <p>Retrieve a list of all bookings.</p>
+                        <p><strong>Response Example:</strong></p>
+                        <pre class="bg-light p-3 rounded">
+[
+    {
+        "id": 1,
+        "name": "John Doe",
+        "startDate": "2025-01-10",
+        "endDate": "2025-01-12",
+        ...
+    },
+    ...
+]
+                    </pre>
+                    </div>
+                </div>
+
+                <!-- Create Booking -->
+                <div class="card mb-3">
+                    <div class="card-body">
+                        <h5>Create a Booking</h5>
+                        <p><strong>POST</strong> <code>https://auberge-jeunesse.pierrenogaro.com/api/create/booking</code></p>
+                        <p>Create a new booking. You must be logged in to use this endpoint.</p>
+                        <p><strong>Request Example:</strong></p>
+                        <pre class="bg-light p-3 rounded">
+{
+    "name": "Jane Doe",
+    "startDate": "2025-01-10",
+    "endDate": "2025-01-12",
+    "email": "jane.doe@example.com",
+    "phone": "123456789",
+    "numberOfPeople": 2,
+    "room": [{"id": 1}]
+}
+                    </pre>
+                        <p><strong>Response Example:</strong></p>
+                        <pre class="bg-light p-3 rounded">
+{
+    "id": 2,
+    "name": "Jane Doe",
+    "startDate": "2025-01-10",
+    "endDate": "2025-01-12",
+    "email": "jane.doe@example.com",
+    "phone": "123456789",
+    "rooms": [{"id": 1, "name": "Room A"}],
+    ...
+}
+                    </pre>
+                    </div>
+                </div>
+
+                <!-- Delete Booking -->
+                <div class="card mb-3">
+                    <div class="card-body">
+                        <h5>Delete a Booking</h5>
+                        <p><strong>DELETE</strong> <code>https://auberge-jeunesse.pierrenogaro.com/api/delete/booking/{id}</code></p>
+                        <p>Delete a booking by providing its ID.</p>
+                        <p><strong>Response Example:</strong></p>
+                        <pre class="bg-light p-3 rounded">
+{
+    "message": "Booking deleted successfully"
+}
+                    </pre>
+                    </div>
+                </div>
+
+                <!-- Create Checkout Session -->
+                <div class="card mb-3">
+                    <div class="card-body">
+                        <h5>Create a Checkout Session</h5>
+                        <p><strong>POST</strong> <code>https://auberge-jeunesse.pierrenogaro.com/api/create-checkout-session</code></p>
+                        <p>Create a Stripe checkout session to proceed with payment for a booking. You must be logged in to use this endpoint.</p>
+                        <p><strong>Response Example:</strong></p>
+                        <pre class="bg-light p-3 rounded">
+{
+    "id": "cs_test_1234567890"
+}
+                    </pre>
+                    </div>
+                </div>
+
+                <!-- Payment Success -->
+                <div class="card mb-3">
+                    <div class="card-body">
+                        <h5>Payment Success</h5>
+                        <p><strong>GET</strong> <code>https://auberge-jeunesse.pierrenogaro.com/payment/success</code></p>
+                        <p>Indicates a successful payment and confirms the booking.</p>
+                        <p><strong>Response Example:</strong></p>
+                        <pre class="bg-light p-3 rounded">
+{
+    "message": "Payment successful! Your booking has been confirmed."
+}
+                    </pre>
+                    </div>
+                </div>
+
+                <!-- Payment Cancel -->
+                <div class="card mb-3">
+                    <div class="card-body">
+                        <h5>Payment Cancel</h5>
+                        <p><strong>GET</strong> <code>https://auberge-jeunesse.pierrenogaro.com/payment/cancel</code></p>
+                        <p>Indicates a cancelled payment. The booking is not completed.</p>
+                        <p><strong>Response Example:</strong></p>
+                        <pre class="bg-light p-3 rounded">
+{
+    "message": "Payment cancelled. Your booking was not completed."
+}
+                    </pre>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Bed Management Section -->
+        <div class="card mb-4 shadow-sm">
+            <div class="card-header bg-info text-white">
+                <h2>🛌 Bed Management</h2>
+            </div>
+            <div class="card-body">
+
+                <!-- Get All Beds -->
+                <div class="card mb-3">
+                    <div class="card-body">
+                        <h5>Get All Beds</h5>
+                        <p><strong>GET</strong> <code>https://auberge-jeunesse.pierrenogaro.com/api/beds</code></p>
+                        <p>Retrieve a list of all beds.</p>
+                        <p><strong>Response Example:</strong></p>
+                        <pre class="bg-light p-3 rounded">
+[
+    {
+        "id": 1,
+        "room": {"id": 1, "name": "Room A"},
+        "isCleaned": true,
+        ...
+    },
+    ...
+]
+                    </pre>
+                    </div>
+                </div>
+
+                <!-- Create Bed -->
+                <div class="card mb-3">
+                    <div class="card-body">
+                        <h5>Create a Bed</h5>
+                        <p><strong>POST</strong> <code>https://auberge-jeunesse.pierrenogaro.com/api/create/bed</code></p>
+                        <p>Create a new bed in a specific room. You must be logged in to use this endpoint.</p>
+                        <p><strong>Request Example:</strong></p>
+                        <pre class="bg-light p-3 rounded">
+{
+    "room": 1
+}
+                    </pre>
+                        <p><strong>Response Example:</strong></p>
+                        <pre class="bg-light p-3 rounded">
+{
+    "id": 2,
+    "room": {"id": 1, "name": "Room A"},
+    "isCleaned": false,
+    ...
+}
+                    </pre>
+                    </div>
+                </div>
+
+                <!-- Edit Bed -->
+                <div class="card mb-3">
+                    <div class="card-body">
+                        <h5>Edit a Bed</h5>
+                        <p><strong>PUT</strong> <code>https://auberge-jeunesse.pierrenogaro.com/api/edit/bed/{id}</code></p>
+                        <p>Edit the details of an existing bed.</p>
+                        <p><strong>Request Example:</strong></p>
+                        <pre class="bg-light p-3 rounded">
+{
+    "isCleaned": true
+}
+                    </pre>
+                        <p><strong>Response Example:</strong></p>
+                        <pre class="bg-light p-3 rounded">
+{
+    "id": 2,
+    "room": {"id": 1, "name": "Room A"},
+    "isCleaned": true,
+    ...
+}
+                    </pre>
+                    </div>
+                </div>
+
+                <!-- Update Bed Clean Status -->
+                <div class="card mb-3">
+                    <div class="card-body">
+                        <h5>Update Bed Clean Status</h5>
+                        <p><strong>PUT</strong> <code>https://auberge-jeunesse.pierrenogaro.com/api/beds/edit/{id}/clean-status</code></p>
+                        <p>Update the cleanliness status of a bed.</p>
+                        <p><strong>Request Example:</strong></p>
+                        <pre class="bg-light p-3 rounded">
+{
+    "isCleaned": true
+}
+                    </pre>
+                        <p><strong>Response Example:</strong></p>
+                        <pre class="bg-light p-3 rounded">
+{
+    "message": "Bed clean status updated",
+    "isCleaned": true
+}
+                    </pre>
+                    </div>
+                </div>
+
+                <!-- Get Bed Clean Status -->
+                <div class="card mb-3">
+                    <div class="card-body">
+                        <h5>Get Bed Clean Status</h5>
+                        <p><strong>GET</strong> <code>https://auberge-jeunesse.pierrenogaro.com/api/beds/{id}/clean-status</code></p>
+                        <p>Retrieve the cleanliness status of a specific bed.</p>
+                        <p><strong>Response Example:</strong></p>
+                        <pre class="bg-light p-3 rounded">
+{
+    "isCleaned": true
+}
+                    </pre>
+                    </div>
+                </div>
+
+                <!-- Delete Bed -->
+                <div class="card mb-3">
+                    <div class="card-body">
+                        <h5>Delete a Bed</h5>
+                        <p><strong>DELETE</strong> <code>https://auberge-jeunesse.pierrenogaro.com/api/delete/bed/{id}</code></p>
+                        <p>Delete a bed by providing its ID.</p>
+                        <p><strong>Response Example:</strong></p>
+                        <pre class="bg-light p-3 rounded">
+{
+    "message": "Bed deleted successfully"
+}
+                    </pre>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 {% endblock %}
