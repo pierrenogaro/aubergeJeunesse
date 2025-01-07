@@ -19,34 +19,34 @@ class Booking
     private ?int $id = null;
 
     #[ORM\Column(type: Types::DATE_MUTABLE)]
-    #[Groups(["bookings_read","booking_create", "booking_edit"])]
+    #[Groups(["bookings_read","booking_create", "booking_edit", "rooms_read"])]
     private ?\DateTimeInterface $startDate = null;
 
     #[ORM\Column(type: Types::DATE_MUTABLE)]
-    #[Groups(["bookings_read","booking_create", "booking_edit"])]
+    #[Groups(["bookings_read","booking_create", "booking_edit", "rooms_read"])]
     private ?\DateTimeInterface $endDate = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(["bookings_read","booking_create", "booking_edit"])]
+    #[Groups(["bookings_read","booking_create", "booking_edit", "rooms_read"])]
     private ?string $name = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(["bookings_read","booking_create", "booking_edit"])]
+    #[Groups(["bookings_read","booking_create", "booking_edit", "rooms_read"])]
     private ?string $email = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(["bookings_read","booking_create", "booking_edit"])]
+    #[Groups(["bookings_read","booking_create", "booking_edit", "rooms_read"])]
     private ?string $phone = null;
 
     #[ORM\Column]
-    #[Groups(["bookings_read","booking_create", "booking_edit"])]
+    #[Groups(["bookings_read","booking_create", "booking_edit", "rooms_read"])]
     private ?int $numberOfPeople = null;
 
     /**
      * @var Collection<int, Room>
      */
     #[ORM\ManyToMany(targetEntity: Room::class, inversedBy: 'bookings', cascade: ['persist'])]
-    #[Groups(["bookings_read","booking_create", "booking_edit"])]
+    #[Groups(["bookings_read","booking_create", "booking_edit", "bookings_read"])]
     private Collection $room;
 
 

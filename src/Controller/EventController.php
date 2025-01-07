@@ -11,7 +11,6 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
-use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Symfony\Component\Serializer\SerializerInterface;
 
 class EventController extends AbstractController
@@ -26,12 +25,13 @@ class EventController extends AbstractController
     #[Route('/api/create/event', name: 'create_event', methods: ['POST'])]
     public function create(Request $request, SerializerInterface $serializer, EntityManagerInterface $manager, Security $security): JsonResponse
     {
-        $event = $serializer->deserialize($request->getContent(), Event::class, 'json');
-        $author = $security->getUser();
-        if (!$author) {
-            throw new AccessDeniedException('You must be logged in to create a event.');
+        $user = $security->getUser();
+
+        if (!$user || !in_array('ROLE_EMPLOYEE', $user->getRoles()) && !in_array('ROLE_ADMIN', $user->getRoles())) {
+            return $this->json(['error' => 'Access denied: Only employees and admins can create events.'], 403);
         }
 
+        $event = $serializer->deserialize($request->getContent(), Event::class, 'json');
         $manager->persist($event);
         $manager->flush();
 
@@ -39,8 +39,14 @@ class EventController extends AbstractController
     }
 
     #[Route('/api/delete/event/{id}', name: 'app_event_delete', methods: ['DELETE'])]
-    public function delete(Event $event, EntityManagerInterface $manager): Response
+    public function delete(Event $event, EntityManagerInterface $manager, Security $security): Response
     {
+        $user = $security->getUser();
+
+        if (!$user || !in_array('ROLE_EMPLOYEE', $user->getRoles()) && !in_array('ROLE_ADMIN', $user->getRoles())) {
+            return $this->json(['error' => 'Access denied: Only employees and admins can delete events.'], 403);
+        }
+
         if (!$event) {
             return $this->json(['error' => 'Event not found'], 404);
         }
@@ -54,8 +60,14 @@ class EventController extends AbstractController
     }
 
     #[Route('/api/edit/event/{id}', name: 'edit_event', methods: ['PUT'])]
-    public function edit(Request $request, Event $event, EventRepository $eventRepository, SerializerInterface $serializer, EntityManagerInterface $manager): JsonResponse
+    public function edit(Request $request, Event $event, SerializerInterface $serializer, EntityManagerInterface $manager, Security $security): JsonResponse
     {
+        $user = $security->getUser();
+
+        if (!$user || !in_array('ROLE_EMPLOYEE', $user->getRoles()) && !in_array('ROLE_ADMIN', $user->getRoles())) {
+            return $this->json(['error' => 'Access denied: Only employees and admins can edit events.'], 403);
+        }
+
         if (!$event) {
             return $this->json(['error' => 'Event not found'], 404);
         }

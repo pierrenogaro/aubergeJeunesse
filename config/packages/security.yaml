@@ -41,6 +41,8 @@ security:
         # - { path: ^/profile, roles: ROLE_USER }
         - { path: ^/api/login, roles: PUBLIC_ACCESS }
         - { path: ^/api,       roles: IS_AUTHENTICATED_FULLY }
+        - { path: ^/api, roles: ROLE_ADMIN }
+        - { path: ^/api/(create|edit|delete|update|list|beds|rooms|bookings|employees|events)/.*, roles: ROLE_EMPLOYEE }
 
 
 when@test:

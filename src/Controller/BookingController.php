@@ -14,14 +14,19 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Symfony\Component\Serializer\SerializerInterface;
 
 class BookingController extends AbstractController
 {
     #[Route('/api/bookings', name: 'app_booking')]
-    public function index(BookingRepository $bookingRepository): Response
+    public function index(BookingRepository $bookingRepository, Security $security): Response
     {
+        $user = $security->getUser();
+
+        if (!$user || !in_array('ROLE_EMPLOYEE', $user->getRoles()) && !in_array('ROLE_ADMIN', $user->getRoles())) {
+            return $this->json(['error' => 'Access denied: Only employees and admins can view bookings.'], 403);
+        }
+
         $bookings = $bookingRepository->findAll();
         return $this->json($bookings, 200, [], ['groups' => 'bookings_read']);
     }
@@ -31,19 +36,21 @@ class BookingController extends AbstractController
      * @throws \DateMalformedStringException
      */
     #[Route('/api/create/booking', name: 'create_booking', methods: ['POST'])]
-    public function create(Request $request, BookingRepository $bookRepository, RoomRepository $roomRepository, SerializerInterface $serializer, EntityManagerInterface $manager, Security $security): JsonResponse
+    public function create(Request $request, BookingRepository $bookingRepository, RoomRepository $roomRepository, SerializerInterface $serializer, EntityManagerInterface $manager, Security $security): JsonResponse
     {
-        $data = json_decode($request->getContent(), true);
+        $user = $security->getUser();
 
-
-        $author = $security->getUser();
-        if (!$author) {
-            throw new AccessDeniedException('You must be logged in to create a booking.');
+        if (!$user) {
+            return $this->json(['error' => 'You must be logged in to create a booking.'], 403);
         }
 
+        $data = json_decode($request->getContent(), true);
+
         $booking = new Booking();
-        $booking->setStartDate(new \DateTime($data['startDate']));
-        $booking->setEndDate(new \DateTime($data['endDate']));
+        $startDate = new \DateTime($data['startDate']);
+        $endDate = new \DateTime($data['endDate']);
+        $booking->setStartDate($startDate);
+        $booking->setEndDate($endDate);
         $booking->setName($data['name']);
         $booking->setEmail($data['email']);
         $booking->setPhone($data['phone']);
@@ -56,6 +63,20 @@ class BookingController extends AbstractController
                 return $this->json(['error' => 'Room not found'], 404);
             }
 
+            $existingBookings = $bookingRepository->createQueryBuilder('b')
+                ->join('b.room', 'r')
+                ->where('r.id = :roomId')
+                ->andWhere('b.startDate < :endDate AND b.endDate > :startDate')
+                ->setParameter('roomId', $room->getId())
+                ->setParameter('startDate', $startDate)
+                ->setParameter('endDate', $endDate)
+                ->getQuery()
+                ->getResult();
+
+            if (count($existingBookings) > 0) {
+                return $this->json(['error' => 'This room is already booked for the selected dates.'], 400);
+            }
+
             $booking->addRoom($room);
         }
 
@@ -66,16 +87,28 @@ class BookingController extends AbstractController
     }
 
     #[Route('/api/delete/booking/{id}', name: 'app_booking_delete', methods: ['DELETE'])]
-    public function delete(Booking $booking, EntityManagerInterface $manager): Response
+    public function delete(Booking $booking, EntityManagerInterface $manager, Security $security): Response
     {
-        if (!$booking) {
-            return $this->json(['error' => 'Booking not found'], 404);
+        $user = $security->getUser();
+
+        if ($user && (in_array('ROLE_EMPLOYEE', $user->getRoles()) || in_array('ROLE_ADMIN', $user->getRoles()))) {
+            if (!$booking) {
+                return $this->json(['error' => 'Booking not found'], 404);
+            }
+            $manager->remove($booking);
+            $manager->flush();
+
+            return $this->json(['message' => 'Booking deleted successfully'], 200);
         }
-        $manager->remove($booking);
-        $manager->flush();
 
-        return $this->json(['message' => 'Booking deleted successfully'], 201);
+        if ($user && $booking->getEmail() === $user->getEmail()) {
+            $manager->remove($booking);
+            $manager->flush();
 
+            return $this->json(['message' => 'Your booking has been successfully cancelled.'], 200);
+        }
+
+        return $this->json(['error' => 'Access denied: You can only cancel your own booking.'], 403);
     }
 
     /**
@@ -93,7 +126,7 @@ class BookingController extends AbstractController
             'price_data' => [
                 'currency' => 'eur',
                 'product_data' => [
-                    'name' => 'Réservation de chambre',
+                    'name' => 'Booking Room',
                 ],
                 'unit_amount' => 5000,
             ],

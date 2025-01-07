@@ -11,7 +11,6 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
-use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Symfony\Component\Serializer\SerializerInterface;
 
 class BedController extends AbstractController
@@ -26,14 +25,15 @@ class BedController extends AbstractController
     #[Route('/api/create/bed', name: 'create_bed', methods: ['POST'])]
     public function create(Request $request, RoomRepository $roomRepository, SerializerInterface $serializer, EntityManagerInterface $manager, Security $security): JsonResponse
     {
+        $author = $security->getUser();
+
+        if (!$author || !in_array('ROLE_EMPLOYEE', $author->getRoles()) && !in_array('ROLE_ADMIN', $author->getRoles())) {
+            return $this->json(['error' => 'Access denied: Only employees and admins can create beds.'], 403);
+        }
+
         $data = json_decode($request->getContent(), true);
 
         $bed = $serializer->deserialize($request->getContent(), Bed::class, 'json');
-        $author = $security->getUser();
-        if (!$author) {
-            throw new AccessDeniedException('You must be logged in to create a bed.');
-        }
-
         $roomId = $data['room'];
         $room = $roomRepository->find($roomId);
 
@@ -51,8 +51,14 @@ class BedController extends AbstractController
     }
 
     #[Route('/api/delete/bed/{id}', name: 'app_bed_delete', methods: ['DELETE'])]
-    public function delete(Bed $bed, EntityManagerInterface $manager): Response
+    public function delete(Bed $bed, EntityManagerInterface $manager, Security $security): Response
     {
+        $author = $security->getUser();
+
+        if (!$author || !in_array('ROLE_EMPLOYEE', $author->getRoles()) && !in_array('ROLE_ADMIN', $author->getRoles())) {
+            return $this->json(['error' => 'Access denied: Only employees and admins can delete beds.'], 403);
+        }
+
         if (!$bed) {
             return $this->json(['error' => 'Bed not found'], 404);
         }
@@ -69,6 +75,12 @@ class BedController extends AbstractController
     #[Route('/api/edit/bed/{id}', name: 'edit_bed', methods: ['PUT'])]
     public function edit(Request $request, Bed $bed, SerializerInterface $serializer, EntityManagerInterface $manager, Security $security): JsonResponse
     {
+        $author = $security->getUser();
+
+        if (!$author || !in_array('ROLE_EMPLOYEE', $author->getRoles()) && !in_array('ROLE_ADMIN', $author->getRoles())) {
+            return $this->json(['error' => 'Access denied: Only employees and admins can edit beds.'], 403);
+        }
+
         if (!$bed) {
             return $this->json(['error' => 'Bed not found'], 404);
         }
@@ -83,8 +95,14 @@ class BedController extends AbstractController
     }
 
     #[Route('/api/beds/edit/{id}/clean-status', name: 'update_bed_clean_status', methods: ['PUT'])]
-    public function updateCleanStatus(Bed $bed, Request $request, EntityManagerInterface $manager): JsonResponse
+    public function updateCleanStatus(Bed $bed, Request $request, EntityManagerInterface $manager, Security $security): JsonResponse
     {
+        $author = $security->getUser();
+
+        if (!$author || !in_array('ROLE_EMPLOYEE', $author->getRoles()) && !in_array('ROLE_ADMIN', $author->getRoles())) {
+            return $this->json(['error' => 'Access denied: Only employees and admins can update bed clean status.'], 403);
+        }
+
         if (!$bed) {
             return $this->json(['error' => 'Bed not found'], 404);
         }

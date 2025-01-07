@@ -49,7 +49,7 @@ class Room
      * @var Collection<int, Booking>
      */
     #[ORM\ManyToMany(targetEntity: Booking::class, mappedBy: 'room')]
-    #[Groups(["rooms_read", "room_edit", "room_create", "room_delete", "beds_read", "bed_edit", "bed_create"])]
+    #[Groups(["rooms_read", "room_edit", "room_create", "room_delete", "bookings_read"])]
     private Collection $bookings;
 
     public function __construct()
