@@ -34,4 +34,24 @@ class AdminController extends AbstractController
 
         return $this->json(['message' => 'Employee removed successfully'], 200);
     }
+
+    #[Route('/api/admin/promote/employee/{id}', name: 'promote_employee', methods: ['PUT'])]
+    public function promoteEmployee(User $user, EntityManagerInterface $manager, Security $security): JsonResponse
+    {
+        $admin = $security->getUser();
+
+        if (!$admin || !in_array('ROLE_ADMIN', $admin->getRoles())) {
+            throw new AccessDeniedException('You do not have permission to promote users.');
+        }
+
+        if (in_array('ROLE_EMPLOYEE', $user->getRoles())) {
+            return $this->json(['error' => 'User is already an employee.'], 400);
+        }
+
+        $user->addRole('ROLE_EMPLOYEE');
+        $manager->persist($user);
+        $manager->flush();
+
+        return $this->json(['message' => 'User promoted to employee successfully'], 200);
+    }
 }

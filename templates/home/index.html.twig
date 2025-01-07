@@ -638,6 +638,37 @@
                     </div>
                 </div>
 
+                <div class="card mb-3">
+                    <div class="card-body">
+                        <h5>Promote an Employee</h5>
+                        <p><strong>PUT</strong> <code>https://auberge-jeunesse.pierrenogaro.com/api/admin/promote/employee/{id}</code></p>
+                        <p>Promote a user to the <code>ROLE_EMPLOYEE</code> role by their ID. Only users with <code>ROLE_ADMIN</code> can access this endpoint.</p>
+
+                        <h6>Authorization</h6>
+                        <p>This route requires an admin user to be authenticated with the <code>ROLE_ADMIN</code> role.</p>
+
+                        <h6>Conditions:</h6>
+                        <ul>
+                            <li>The user to be promoted must not already have the <code>ROLE_EMPLOYEE</code> role.</li>
+                            <li>The admin cannot promote themselves.</li>
+                        </ul>
+
+                        <h6>Response Example:</h6>
+                        <pre class="bg-light p-3 rounded">
+{
+    "message": "User promoted to employee successfully"
+}
+                </pre>
+
+                        <h6>Error Responses:</h6>
+                        <ul>
+                            <li><strong>403 Forbidden:</strong> You do not have permission to promote users.</li>
+                            <li><strong>400 Bad Request:</strong> User is already an employee.</li>
+                            <li><strong>400 Bad Request:</strong> Cannot promote yourself.</li>
+                        </ul>
+                    </div>
+                </div>
+
             </div>
         </div>
 {% endblock %}
