@@ -57,7 +57,7 @@
                 <h2>🔐 Login</h2>
             </div>
             <div class="card-body">
-                <p><code class="text-primary">POST https://auberge-jeunesse.pierrenogaro.com/login_check</code></p>
+                <p><code class="text-primary">POST https://auberge-jeunesse.pierrenogaro.com/api/login_check</code></p>
 
                 <h4>📤 Request</h4>
                 <p>The request body must be sent in JSON format:</p>
@@ -85,7 +85,7 @@
         </div>
 
         <div class="card mb-4 shadow-sm">
-            <div class="card-header bg-info text-white">
+            <div class="card-header bg-primary text-white">
                 <h2>🛏️ Room Management</h2>
             </div>
             <div class="card-body">
@@ -94,19 +94,30 @@
                     <div class="card-body">
                         <h5>Get All Rooms</h5>
                         <p><strong>GET</strong> <code>https://auberge-jeunesse.pierrenogaro.com/api/rooms</code></p>
-                        <p>Retrieve a list of all rooms in the system.</p>
+                        <p>Retrieve a list of all rooms.</p>
                         <p><strong>Response Example:</strong></p>
                         <pre class="bg-light p-3 rounded">
 [
     {
         "id": 1,
-        "name": "Room A",
+        "name": "Deluxe Suite",
         "capacity": 4,
-        ...
-    },
-    ...
+        "type": "suite",
+        "description": "A spacious room with a beautiful view.",
+        "isAvailable": true,
+        "beds": [
+            {
+                "id": 1,
+                "number": 1,
+                "isAvailable": true,
+                "bedNumber": "Bed 1",
+                "isCleaned": false
+            }
+        ],
+        "bookings": []
+    }
 ]
-                    </pre>
+                </pre>
                     </div>
                 </div>
 
@@ -114,23 +125,31 @@
                     <div class="card-body">
                         <h5>Create a Room</h5>
                         <p><strong>POST</strong> <code>https://auberge-jeunesse.pierrenogaro.com/api/create/room</code></p>
-                        <p>Create a new room. You must be logged in to use this endpoint.</p>
+                        <p>Create a new room. You must be logged in as an employee or admin to use this endpoint.</p>
                         <p><strong>Request Example:</strong></p>
                         <pre class="bg-light p-3 rounded">
 {
     "name": "Room B",
-    "capacity": 3
+    "capacity": 2,
+    "type": "standard",
+    "description": "A comfortable room for two people.",
+    "isAvailable": true
 }
-                    </pre>
+                </pre>
                         <p><strong>Response Example:</strong></p>
                         <pre class="bg-light p-3 rounded">
 {
     "id": 2,
     "name": "Room B",
-    "capacity": 3,
-    ...
+    "capacity": 2,
+    "type": "standard",
+    "description": "A comfortable room for two people.",
+    "isAvailable": true,
+    "beds": [],
+    "bookings": []
 }
-                    </pre>
+                </pre>
+                        <p class="text-danger"><strong>Note:</strong> Authentication required.</p>
                     </div>
                 </div>
 
@@ -138,23 +157,31 @@
                     <div class="card-body">
                         <h5>Edit a Room</h5>
                         <p><strong>PUT</strong> <code>https://auberge-jeunesse.pierrenogaro.com/api/edit/room/{id}</code></p>
-                        <p>Edit an existing room by providing its ID.</p>
+                        <p>Edit an existing room by providing its ID. Only employees or admins can use this endpoint.</p>
                         <p><strong>Request Example:</strong></p>
                         <pre class="bg-light p-3 rounded">
 {
-    "name": "Updated Room",
-    "capacity": 5
+    "name": "Updated Room Name",
+    "capacity": 5,
+    "type": "deluxe",
+    "description": "Updated room description.",
+    "isAvailable": false
 }
-                    </pre>
+                </pre>
                         <p><strong>Response Example:</strong></p>
                         <pre class="bg-light p-3 rounded">
 {
     "id": 2,
-    "name": "Updated Room",
+    "name": "Updated Room Name",
     "capacity": 5,
-    ...
+    "type": "deluxe",
+    "description": "Updated room description.",
+    "isAvailable": false,
+    "beds": [],
+    "bookings": []
 }
-                    </pre>
+                </pre>
+                        <p class="text-danger"><strong>Note:</strong> Authentication required.</p>
                     </div>
                 </div>
 
@@ -162,18 +189,157 @@
                     <div class="card-body">
                         <h5>Delete a Room</h5>
                         <p><strong>DELETE</strong> <code>https://auberge-jeunesse.pierrenogaro.com/api/delete/room/{id}</code></p>
-                        <p>Delete a room by providing its ID.</p>
+                        <p>Delete an existing room by providing its ID. Only employees or admins can use this endpoint.</p>
                         <p><strong>Response Example:</strong></p>
                         <pre class="bg-light p-3 rounded">
 {
     "message": "Room deleted successfully"
 }
-                    </pre>
+                </pre>
+                        <p class="text-danger"><strong>Note:</strong> Authentication required.</p>
                     </div>
                 </div>
             </div>
         </div>
 
+        <div class="card mb-4 shadow-sm">
+            <div class="card-header bg-info text-white">
+                <h2>🛏️ Bed Management</h2>
+            </div>
+            <div class="card-body">
+
+                <div class="card mb-3">
+                    <div class="card-body">
+                        <h5>Get All Beds</h5>
+                        <p><strong>GET</strong> <code>https://auberge-jeunesse.pierrenogaro.com/api/beds</code></p>
+                        <p>Retrieve a list of all beds.</p>
+                        <p><strong>Response Example:</strong></p>
+                        <pre class="bg-light p-3 rounded">
+[
+    {
+        "id": 1,
+        "room": {"id": 1, "name": "Room A"},
+        "number": 1,
+        "isAvailable": true,
+        "bedNumber": "Bed 1",
+        "isCleaned": false
+    }
+]
+                </pre>
+                    </div>
+                </div>
+
+                <div class="card mb-3">
+                    <div class="card-body">
+                        <h5>Create a Bed</h5>
+                        <p><strong>POST</strong> <code>https://auberge-jeunesse.pierrenogaro.com/api/create/bed</code></p>
+                        <p>Create a new bed in a specific room. You must be logged in as an employee or admin to use this endpoint.</p>
+                        <p><strong>Request Example:</strong></p>
+                        <pre class="bg-light p-3 rounded">
+{
+    "room": 1,
+    "number": 2,
+    "bedNumber": "Bed 2",
+    "isAvailable": true,
+    "isCleaned": false
+}
+                </pre>
+                        <p><strong>Response Example:</strong></p>
+                        <pre class="bg-light p-3 rounded">
+{
+    "id": 2,
+    "room": {"id": 1, "name": "Room A"},
+    "number": 2,
+    "bedNumber": "Bed 2",
+    "isAvailable": true,
+    "isCleaned": false
+}
+                </pre>
+                        <p class="text-danger"><strong>Note:</strong> Authentication required.</p>
+                    </div>
+                </div>
+
+                <div class="card mb-3">
+                    <div class="card-body">
+                        <h5>Edit a Bed</h5>
+                        <p><strong>PUT</strong> <code>https://auberge-jeunesse.pierrenogaro.com/api/edit/bed/{id}</code></p>
+                        <p>Edit the details of an existing bed. Only employees or admins can use this endpoint.</p>
+                        <p><strong>Request Example:</strong></p>
+                        <pre class="bg-light p-3 rounded">
+{
+    "number": 3,
+    "bedNumber": "Bed 3",
+    "isAvailable": false,
+    "isCleaned": true
+}
+                </pre>
+                        <p><strong>Response Example:</strong></p>
+                        <pre class="bg-light p-3 rounded">
+{
+    "id": 2,
+    "room": {"id": 1, "name": "Room A"},
+    "number": 3,
+    "bedNumber": "Bed 3",
+    "isAvailable": false,
+    "isCleaned": true
+}
+                </pre>
+                        <p class="text-danger"><strong>Note:</strong> Authentication required.</p>
+                    </div>
+                </div>
+
+                <div class="card mb-3">
+                    <div class="card-body">
+                        <h5>Update Bed Clean Status</h5>
+                        <p><strong>PUT</strong> <code>https://auberge-jeunesse.pierrenogaro.com/api/beds/edit/{id}/clean-status</code></p>
+                        <p>Update the cleanliness status of a bed. Only employees or admins can use this endpoint.</p>
+                        <p><strong>Request Example:</strong></p>
+                        <pre class="bg-light p-3 rounded">
+{
+    "isCleaned": true
+}
+                </pre>
+                        <p><strong>Response Example:</strong></p>
+                        <pre class="bg-light p-3 rounded">
+{
+    "message": "Bed clean status updated",
+    "isCleaned": true
+}
+                </pre>
+                        <p class="text-danger"><strong>Note:</strong> Authentication required.</p>
+                    </div>
+                </div>
+
+                <div class="card mb-3">
+                    <div class="card-body">
+                        <h5>Get Bed Clean Status</h5>
+                        <p><strong>GET</strong> <code>https://auberge-jeunesse.pierrenogaro.com/api/beds/{id}/clean-status</code></p>
+                        <p>Retrieve the cleanliness status of a specific bed.</p>
+                        <p><strong>Response Example:</strong></p>
+                        <pre class="bg-light p-3 rounded">
+{
+    "isCleaned": true
+}
+                </pre>
+                    </div>
+                </div>
+
+                <div class="card mb-3">
+                    <div class="card-body">
+                        <h5>Delete a Bed</h5>
+                        <p><strong>DELETE</strong> <code>https://auberge-jeunesse.pierrenogaro.com/api/delete/bed/{id}</code></p>
+                        <p>Delete a bed by providing its ID. Only employees or admins can use this endpoint.</p>
+                        <p><strong>Response Example:</strong></p>
+                        <pre class="bg-light p-3 rounded">
+{
+    "message": "Bed deleted successfully"
+}
+                </pre>
+                        <p class="text-danger"><strong>Note:</strong> Authentication required.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
 
         <div class="card mb-4 shadow-sm">
             <div class="card-header bg-warning text-white">
@@ -192,12 +358,15 @@
     {
         "id": 1,
         "title": "Event A",
-        "description": "Description of Event A",
-        ...
+        "description": "Details about Event A"
     },
-    ...
+    {
+        "id": 2,
+        "title": "Event B",
+        "description": "Details about Event B"
+    }
 ]
-                    </pre>
+                </pre>
                     </div>
                 </div>
 
@@ -205,25 +374,23 @@
                     <div class="card-body">
                         <h5>Create an Event</h5>
                         <p><strong>POST</strong> <code>https://auberge-jeunesse.pierrenogaro.com/api/create/event</code></p>
-                        <p>Create a new event. You must be logged in to use this endpoint.</p>
+                        <p>Create a new event. You must be logged in as an employee or admin to use this endpoint.</p>
                         <p><strong>Request Example:</strong></p>
                         <pre class="bg-light p-3 rounded">
 {
-    "title": "Event B",
-    "description": "Details about Event B",
-    "date": "2025-01-05"
+    "title": "Event C",
+    "description": "Details about Event C"
 }
-                    </pre>
+                </pre>
                         <p><strong>Response Example:</strong></p>
                         <pre class="bg-light p-3 rounded">
 {
-    "id": 2,
-    "title": "Event B",
-    "description": "Details about Event B",
-    "date": "2025-01-05",
-    ...
+    "id": 3,
+    "title": "Event C",
+    "description": "Details about Event C"
 }
-                    </pre>
+                </pre>
+                        <p class="text-danger"><strong>Note:</strong> Authentication required.</p>
                     </div>
                 </div>
 
@@ -231,25 +398,23 @@
                     <div class="card-body">
                         <h5>Edit an Event</h5>
                         <p><strong>PUT</strong> <code>https://auberge-jeunesse.pierrenogaro.com/api/edit/event/{id}</code></p>
-                        <p>Edit an existing event by providing its ID.</p>
+                        <p>Edit the details of an existing event. Only employees or admins can use this endpoint.</p>
                         <p><strong>Request Example:</strong></p>
                         <pre class="bg-light p-3 rounded">
 {
-    "title": "Updated Event",
-    "description": "Updated details",
-    "date": "2025-01-06"
+    "title": "Updated Event Title",
+    "description": "Updated Event Details"
 }
-                    </pre>
+                </pre>
                         <p><strong>Response Example:</strong></p>
                         <pre class="bg-light p-3 rounded">
 {
-    "id": 2,
-    "title": "Updated Event",
-    "description": "Updated details",
-    "date": "2025-01-06",
-    ...
+    "id": 1,
+    "title": "Updated Event Title",
+    "description": "Updated Event Details"
 }
-                    </pre>
+                </pre>
+                        <p class="text-danger"><strong>Note:</strong> Authentication required.</p>
                     </div>
                 </div>
 
@@ -257,108 +422,14 @@
                     <div class="card-body">
                         <h5>Delete an Event</h5>
                         <p><strong>DELETE</strong> <code>https://auberge-jeunesse.pierrenogaro.com/api/delete/event/{id}</code></p>
-                        <p>Delete an event by providing its ID.</p>
+                        <p>Delete an event by providing its ID. Only employees or admins can use this endpoint.</p>
                         <p><strong>Response Example:</strong></p>
                         <pre class="bg-light p-3 rounded">
 {
     "message": "Event deleted successfully"
 }
-                    </pre>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="card mb-4 shadow-sm">
-            <div class="card-header bg-danger text-white">
-                <h2>👔 Employee Management</h2>
-            </div>
-            <div class="card-body">
-
-                <!-- Get All Employees -->
-                <div class="card mb-3">
-                    <div class="card-body">
-                        <h5>Get All Employees</h5>
-                        <p><strong>GET</strong> <code>https://auberge-jeunesse.pierrenogaro.com/api/employees</code></p>
-                        <p>Retrieve a list of all employees.</p>
-                        <p><strong>Response Example:</strong></p>
-                        <pre class="bg-light p-3 rounded">
-[
-    {
-        "id": 1,
-        "name": "John Doe",
-        "position": "Manager",
-        ...
-    },
-    ...
-]
-                    </pre>
-                    </div>
-                </div>
-
-                <div class="card mb-3">
-                    <div class="card-body">
-                        <h5>Create an Employee</h5>
-                        <p><strong>POST</strong> <code>https://auberge-jeunesse.pierrenogaro.com/api/create/employee</code></p>
-                        <p>Create a new employee. You must be logged in to use this endpoint.</p>
-                        <p><strong>Request Example:</strong></p>
-                        <pre class="bg-light p-3 rounded">
-{
-    "name": "Jane Doe",
-    "position": "Receptionist",
-    "salary": 2500
-}
-                    </pre>
-                        <p><strong>Response Example:</strong></p>
-                        <pre class="bg-light p-3 rounded">
-{
-    "id": 2,
-    "name": "Jane Doe",
-    "position": "Receptionist",
-    "salary": 2500,
-    ...
-}
-                    </pre>
-                    </div>
-                </div>
-
-                <div class="card mb-3">
-                    <div class="card-body">
-                        <h5>Edit an Employee</h5>
-                        <p><strong>PUT</strong> <code>https://auberge-jeunesse.pierrenogaro.com/api/edit/employee/{id}</code></p>
-                        <p>Edit an existing employee by providing their ID.</p>
-                        <p><strong>Request Example:</strong></p>
-                        <pre class="bg-light p-3 rounded">
-{
-    "name": "Updated Name",
-    "position": "Updated Position",
-    "salary": 3000
-}
-                    </pre>
-                        <p><strong>Response Example:</strong></p>
-                        <pre class="bg-light p-3 rounded">
-{
-    "id": 2,
-    "name": "Updated Name",
-    "position": "Updated Position",
-    "salary": 3000,
-    ...
-}
-                    </pre>
-                    </div>
-                </div>
-
-                <div class="card mb-3">
-                    <div class="card-body">
-                        <h5>Delete an Employee</h5>
-                        <p><strong>DELETE</strong> <code>https://auberge-jeunesse.pierrenogaro.com/api/delete/employee/{id}</code></p>
-                        <p>Delete an employee by providing their ID.</p>
-                        <p><strong>Response Example:</strong></p>
-                        <pre class="bg-light p-3 rounded">
-{
-    "message": "Employee deleted successfully"
-}
-                    </pre>
+                </pre>
+                        <p class="text-danger"><strong>Note:</strong> Authentication required.</p>
                     </div>
                 </div>
             </div>
@@ -366,7 +437,7 @@
 
         <div class="card mb-4 shadow-sm">
             <div class="card-header bg-dark text-white">
-                <h2>🛏️ Booking Management</h2>
+                <h2>🛌 Booking Management</h2>
             </div>
             <div class="card-body">
 
@@ -374,7 +445,7 @@
                     <div class="card-body">
                         <h5>Get All Bookings</h5>
                         <p><strong>GET</strong> <code>https://auberge-jeunesse.pierrenogaro.com/api/bookings</code></p>
-                        <p>Retrieve a list of all bookings.</p>
+                        <p>Retrieve a list of all bookings. Only employees and admins can access this endpoint.</p>
                         <p><strong>Response Example:</strong></p>
                         <pre class="bg-light p-3 rounded">
 [
@@ -383,11 +454,15 @@
         "name": "John Doe",
         "startDate": "2025-01-10",
         "endDate": "2025-01-12",
-        ...
+        "email": "john.doe@example.com",
+        "phone": "123456789",
+        "numberOfPeople": 2,
+        "room": [{"id": 1, "name": "Room A"}]
     },
     ...
 ]
-                    </pre>
+                </pre>
+                        <p class="text-danger"><strong>Note:</strong> Authentication required.</p>
                     </div>
                 </div>
 
@@ -400,27 +475,28 @@
                         <pre class="bg-light p-3 rounded">
 {
     "name": "Jane Doe",
-    "startDate": "2025-01-10",
-    "endDate": "2025-01-12",
+    "startDate": "2025-01-15",
+    "endDate": "2025-01-17",
     "email": "jane.doe@example.com",
-    "phone": "123456789",
-    "numberOfPeople": 2,
-    "room": [{"id": 1}]
+    "phone": "987654321",
+    "numberOfPeople": 3,
+    "room": [{"id": 2}]
 }
-                    </pre>
+                </pre>
                         <p><strong>Response Example:</strong></p>
                         <pre class="bg-light p-3 rounded">
 {
     "id": 2,
     "name": "Jane Doe",
-    "startDate": "2025-01-10",
-    "endDate": "2025-01-12",
+    "startDate": "2025-01-15",
+    "endDate": "2025-01-17",
     "email": "jane.doe@example.com",
-    "phone": "123456789",
-    "rooms": [{"id": 1, "name": "Room A"}],
-    ...
+    "phone": "987654321",
+    "numberOfPeople": 3,
+    "room": [{"id": 2, "name": "Room B"}]
 }
-                    </pre>
+                </pre>
+                        <p class="text-danger"><strong>Note:</strong> Authentication required.</p>
                     </div>
                 </div>
 
@@ -428,13 +504,14 @@
                     <div class="card-body">
                         <h5>Delete a Booking</h5>
                         <p><strong>DELETE</strong> <code>https://auberge-jeunesse.pierrenogaro.com/api/delete/booking/{id}</code></p>
-                        <p>Delete a booking by providing its ID.</p>
+                        <p>Delete a booking by providing its ID. Employees, admins, or the user who made the booking can delete it.</p>
                         <p><strong>Response Example:</strong></p>
                         <pre class="bg-light p-3 rounded">
 {
     "message": "Booking deleted successfully"
 }
-                    </pre>
+                </pre>
+                        <p class="text-danger"><strong>Note:</strong> Authentication required.</p>
                     </div>
                 </div>
 
@@ -448,7 +525,8 @@
 {
     "id": "cs_test_1234567890"
 }
-                    </pre>
+                </pre>
+                        <p class="text-danger"><strong>Note:</strong> Authentication required.</p>
                     </div>
                 </div>
 
@@ -462,7 +540,7 @@
 {
     "message": "Payment successful! Your booking has been confirmed."
 }
-                    </pre>
+                </pre>
                     </div>
                 </div>
 
@@ -476,133 +554,90 @@
 {
     "message": "Payment cancelled. Your booking was not completed."
 }
-                    </pre>
+                </pre>
                     </div>
                 </div>
             </div>
         </div>
 
         <div class="card mb-4 shadow-sm">
-            <div class="card-header bg-info text-white">
-                <h2>🛌 Bed Management</h2>
+            <div class="card-header bg-danger text-white">
+                <h2>👔 Employee Management</h2>
             </div>
             <div class="card-body">
 
                 <div class="card mb-3">
                     <div class="card-body">
-                        <h5>Get All Beds</h5>
-                        <p><strong>GET</strong> <code>https://auberge-jeunesse.pierrenogaro.com/api/beds</code></p>
-                        <p>Retrieve a list of all beds.</p>
+                        <h5>Get All Employees</h5>
+                        <p><strong>GET</strong> <code>https://auberge-jeunesse.pierrenogaro.com/api/employees</code></p>
+                        <p>Retrieve a list of all employees. Only users with <code>ROLE_EMPLOYEE</code> or <code>ROLE_ADMIN</code> can access this endpoint.</p>
                         <p><strong>Response Example:</strong></p>
                         <pre class="bg-light p-3 rounded">
 [
     {
         "id": 1,
-        "room": {"id": 1, "name": "Room A"},
-        "isCleaned": true,
-        ...
+        "firstName": "John",
+        "lastName": "Doe",
+        "age": 35,
+        "role": "Manager",
+        "description": "Handles operations",
+        "hireDate": "2022-05-15T00:00:00"
     },
-    ...
+    {
+        "id": 2,
+        "firstName": "Jane",
+        "lastName": "Smith",
+        "age": 29,
+        "role": "Receptionist",
+        "description": "Front desk management",
+        "hireDate": "2023-03-10T00:00:00"
+    }
 ]
-                    </pre>
+                </pre>
+                        <p class="text-danger"><strong>Note:</strong> Authentication required.</p>
                     </div>
                 </div>
 
-                <div class="card mb-3">
-                    <div class="card-body">
-                        <h5>Create a Bed</h5>
-                        <p><strong>POST</strong> <code>https://auberge-jeunesse.pierrenogaro.com/api/create/bed</code></p>
-                        <p>Create a new bed in a specific room. You must be logged in to use this endpoint.</p>
-                        <p><strong>Request Example:</strong></p>
-                        <pre class="bg-light p-3 rounded">
-{
-    "room": 1
-}
-                    </pre>
-                        <p><strong>Response Example:</strong></p>
-                        <pre class="bg-light p-3 rounded">
-{
-    "id": 2,
-    "room": {"id": 1, "name": "Room A"},
-    "isCleaned": false,
-    ...
-}
-                    </pre>
-                    </div>
-                </div>
-
-                <div class="card mb-3">
-                    <div class="card-body">
-                        <h5>Edit a Bed</h5>
-                        <p><strong>PUT</strong> <code>https://auberge-jeunesse.pierrenogaro.com/api/edit/bed/{id}</code></p>
-                        <p>Edit the details of an existing bed.</p>
-                        <p><strong>Request Example:</strong></p>
-                        <pre class="bg-light p-3 rounded">
-{
-    "isCleaned": true
-}
-                    </pre>
-                        <p><strong>Response Example:</strong></p>
-                        <pre class="bg-light p-3 rounded">
-{
-    "id": 2,
-    "room": {"id": 1, "name": "Room A"},
-    "isCleaned": true,
-    ...
-}
-                    </pre>
-                    </div>
-                </div>
-
-                <div class="card mb-3">
-                    <div class="card-body">
-                        <h5>Update Bed Clean Status</h5>
-                        <p><strong>PUT</strong> <code>https://auberge-jeunesse.pierrenogaro.com/api/beds/edit/{id}/clean-status</code></p>
-                        <p>Update the cleanliness status of a bed.</p>
-                        <p><strong>Request Example:</strong></p>
-                        <pre class="bg-light p-3 rounded">
-{
-    "isCleaned": true
-}
-                    </pre>
-                        <p><strong>Response Example:</strong></p>
-                        <pre class="bg-light p-3 rounded">
-{
-    "message": "Bed clean status updated",
-    "isCleaned": true
-}
-                    </pre>
-                    </div>
-                </div>
-
-                <div class="card mb-3">
-                    <div class="card-body">
-                        <h5>Get Bed Clean Status</h5>
-                        <p><strong>GET</strong> <code>https://auberge-jeunesse.pierrenogaro.com/api/beds/{id}/clean-status</code></p>
-                        <p>Retrieve the cleanliness status of a specific bed.</p>
-                        <p><strong>Response Example:</strong></p>
-                        <pre class="bg-light p-3 rounded">
-{
-    "isCleaned": true
-}
-                    </pre>
-                    </div>
-                </div>
-
-                <div class="card mb-3">
-                    <div class="card-body">
-                        <h5>Delete a Bed</h5>
-                        <p><strong>DELETE</strong> <code>https://auberge-jeunesse.pierrenogaro.com/api/delete/bed/{id}</code></p>
-                        <p>Delete a bed by providing its ID.</p>
-                        <p><strong>Response Example:</strong></p>
-                        <pre class="bg-light p-3 rounded">
-{
-    "message": "Bed deleted successfully"
-}
-                    </pre>
-                    </div>
-                </div>
             </div>
         </div>
-    </div>
+
+        <div class="card mb-4 shadow-sm">
+            <div class="card-header bg-warning text-white">
+                <h2>🛡️ Admin Management</h2>
+            </div>
+            <div class="card-body">
+
+                <!-- Remove Employee -->
+                <div class="card mb-3">
+                    <div class="card-body">
+                        <h5>Remove an Employee</h5>
+                        <p><strong>DELETE</strong> <code>https://auberge-jeunesse.pierrenogaro.com/api/admin/remove/employee/{id}</code></p>
+                        <p>Remove an employee account by their ID. Only users with <code>ROLE_ADMIN</code> can access this endpoint.</p>
+                        <h6>Authorization</h6>
+                        <p>This route requires an admin user to be authenticated.</p>
+
+                        <h6>Conditions:</h6>
+                        <ul>
+                            <li>The user must have the <code>ROLE_EMPLOYEE</code> role.</li>
+                            <li>The admin cannot remove their own account.</li>
+                        </ul>
+
+                        <h6>Response Example:</h6>
+                        <pre class="bg-light p-3 rounded">
+{
+    "message": "Employee removed successfully"
+}
+                </pre>
+
+                        <h6>Error Responses:</h6>
+                        <ul>
+                            <li><strong>403 Forbidden:</strong> You do not have permission to remove employees.</li>
+                            <li><strong>400 Bad Request:</strong> User is not an employee or cannot be removed.</li>
+                            <li><strong>400 Bad Request:</strong> You cannot remove your own account.</li>
+                        </ul>
+                    </div>
+                </div>
+
+            </div>
+        </div>
 {% endblock %}
