@@ -22,6 +22,12 @@ class RoomController extends AbstractController
         return $this->json($rooms, 200, [], ['groups' => 'rooms_read', 'booking_read']);
     }
 
+    #[Route('/api/rooms/{id}', name: 'get_single_room', methods: ['GET'])]
+    public function getRoom(Room $room): Response
+    {
+        return $this->json($room, 200, [], ['groups' => ['rooms_read', 'booking_read']]);
+    }
+
     #[Route('/api/create/room', name: 'create_room', methods: ['POST'])]
     public function create(Request $request, SerializerInterface $serializer, EntityManagerInterface $manager, Security $security): JsonResponse
     {
