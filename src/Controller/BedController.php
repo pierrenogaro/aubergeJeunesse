@@ -22,6 +22,12 @@ class BedController extends AbstractController
         return $this->json($beds, 200, [], ['groups' => 'beds_read']);
     }
 
+    #[Route('/api/beds/{id}', name: 'get_single_bed', methods: ['GET'])]
+    public function getBed(Bed $bed): Response
+    {
+        return $this->json($bed, 200, [], ['groups' => ['beds_read', 'bed_read']]);
+    }
+
     #[Route('/api/create/bed', name: 'create_bed', methods: ['POST'])]
     public function create(Request $request, RoomRepository $roomRepository, SerializerInterface $serializer, EntityManagerInterface $manager, Security $security): JsonResponse
     {
@@ -73,7 +79,7 @@ class BedController extends AbstractController
     }
 
     #[Route('/api/edit/bed/{id}', name: 'edit_bed', methods: ['PUT'])]
-    public function edit(Request $request, Bed $bed, SerializerInterface $serializer, EntityManagerInterface $manager, Security $security): JsonResponse
+    public function edit(Request $request, Bed $bed, RoomRepository $roomRepository, SerializerInterface $serializer, EntityManagerInterface $manager, Security $security): JsonResponse
     {
         $author = $security->getUser();
 
@@ -85,15 +91,40 @@ class BedController extends AbstractController
             return $this->json(['error' => 'Bed not found'], 404);
         }
 
+        $data = json_decode($request->getContent(), true);
 
-        $serializer->deserialize($request->getContent(), Bed::class, 'json', ['object_to_populate' => $bed]);
+        if (isset($data['room']) && is_array($data['room']) && isset($data['room']['id'])) {
+            $roomId = $data['room']['id'];
+            $room = $roomRepository->find($roomId);
+
+            if (!$room) {
+                return $this->json(['error' => 'Room not found with ID: ' . $roomId], 404);
+            }
+
+            $bed->setRoom($room);
+            unset($data['room']);
+        }
+
+        if (isset($data['number'])) {
+            $bed->setNumber($data['number']);
+        }
+
+        if (isset($data['bedNumber'])) {
+            $bed->setBedNumber($data['bedNumber']);
+        }
+
+        if (isset($data['isAvailable'])) {
+            $bed->setAvailable((bool)$data['isAvailable']);
+        }
+
+        if (isset($data['isCleaned'])) {
+            $bed->setIsCleaned((bool)$data['isCleaned']);
+        }
 
         $manager->flush();
 
         return $this->json($bed, 200, [], ['groups' => ['bed_edit']]);
-
     }
-
     #[Route('/api/beds/edit/{id}/clean-status', name: 'update_bed_clean_status', methods: ['PUT'])]
     public function updateCleanStatus(Bed $bed, Request $request, EntityManagerInterface $manager, Security $security): JsonResponse
     {
